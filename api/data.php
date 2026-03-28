@@ -169,6 +169,11 @@ function handleSirovine($method, $id, $user) {
 function handleDobavljaci($method, $id, $user) {
     $pdo = getDB();
 
+    // Dodaj kolonu pib ako ne postoji
+    try {
+        $pdo->exec("ALTER TABLE dobavljaci ADD COLUMN pib VARCHAR(20) NULL DEFAULT NULL AFTER naziv");
+    } catch (PDOException $e) { /* kolona vec postoji */ }
+
     if ($method === 'GET') {
         if ($id) {
             $stmt = $pdo->prepare("SELECT * FROM dobavljaci WHERE id=? AND aktivan=1");
@@ -196,9 +201,10 @@ function handleDobavljaci($method, $id, $user) {
         if (!$naziv) jsonError('Naziv je obavezan');
 
         $ocena = (int)($data['ocena'] ?? 3);
-        $stmt  = $pdo->prepare("INSERT INTO dobavljaci (naziv, kontakt_osoba, telefon, email, adresa, ocena, ocena_kvalitet, ocena_cena, ocena_rokovi, ocena_placanje, ocena_reklamacije, ugovor, napomena) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt  = $pdo->prepare("INSERT INTO dobavljaci (naziv, pib, kontakt_osoba, telefon, email, adresa, ocena, ocena_kvalitet, ocena_cena, ocena_rokovi, ocena_placanje, ocena_reklamacije, ugovor, napomena) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $naziv,
+            $data['pib'] ? trim($data['pib']) : null,
             $data['kontakt_osoba'] ?? null,
             $data['telefon'] ?? null,
             $data['email'] ?? null,
@@ -227,9 +233,10 @@ function handleDobavljaci($method, $id, $user) {
         if (!$naziv) jsonError('Naziv je obavezan');
 
         $ocena = (int)($data['ocena'] ?? 3);
-        $stmt  = $pdo->prepare("UPDATE dobavljaci SET naziv=?, kontakt_osoba=?, telefon=?, email=?, adresa=?, ocena=?, ocena_kvalitet=?, ocena_cena=?, ocena_rokovi=?, ocena_placanje=?, ocena_reklamacije=?, ugovor=?, napomena=?, updated_at=NOW() WHERE id=? AND aktivan=1");
+        $stmt  = $pdo->prepare("UPDATE dobavljaci SET naziv=?, pib=?, kontakt_osoba=?, telefon=?, email=?, adresa=?, ocena=?, ocena_kvalitet=?, ocena_cena=?, ocena_rokovi=?, ocena_placanje=?, ocena_reklamacije=?, ugovor=?, napomena=?, updated_at=NOW() WHERE id=? AND aktivan=1");
         $stmt->execute([
             $naziv,
+            $data['pib'] ? trim($data['pib']) : null,
             $data['kontakt_osoba'] ?? null,
             $data['telefon'] ?? null,
             $data['email'] ?? null,

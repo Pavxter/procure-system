@@ -890,6 +890,7 @@ function RadarChart({ values }) {
 function DobavljacModal({ item, onSave, onClose }) {
   const init = {
     naziv: item?.naziv || '',
+    pib: item?.pib || '',
     kontakt_osoba: item?.kontakt_osoba || '',
     telefon: item?.telefon || '',
     email: item?.email || '',
@@ -935,6 +936,7 @@ function DobavljacModal({ item, onSave, onClose }) {
         <form onSubmit={submit}>
           <div className="modal-body">
             <div className="field"><label>Naziv *</label><input value={form.naziv} onChange={e => set('naziv', e.target.value)} autoFocus /></div>
+            <div className="field"><label>PIB</label><input value={form.pib} onChange={e => set('pib', e.target.value)} placeholder="9-cifreni PIB" maxLength="20" /></div>
             <div className="field-row">
               <div className="field"><label>Kontakt osoba</label><input value={form.kontakt_osoba} onChange={e => set('kontakt_osoba', e.target.value)} /></div>
               <div className="field"><label>Telefon</label><input value={form.telefon} onChange={e => set('telefon', e.target.value)} /></div>
@@ -1008,6 +1010,7 @@ function Dobavljaci({ user }) {
   function doExport() {
     csvExport(rows, [
       { key:'naziv', label:'Naziv' },
+      { key:'pib', label:'PIB' },
       { key:'kontakt_osoba', label:'Kontakt' },
       { key:'telefon', label:'Telefon' },
       { key:'email', label:'Email' },
@@ -1036,6 +1039,7 @@ function Dobavljaci({ user }) {
                   <div className="card-head">
                     <div>
                       <div className="card-title">{r.naziv}</div>
+                      {r.pib && <div className="card-sub" style={{fontSize:11,color:'#9ca3af'}}>PIB: {r.pib}</div>}
                       <div className="card-sub">{r.kontakt_osoba || '—'}</div>
                     </div>
                     <RadarChart values={radarVals} />
