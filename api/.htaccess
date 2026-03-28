@@ -1,0 +1,8 @@
+# Zabranjuje direktan pristup config.php
+<Files "config.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Zabranjuje directory listing
+Options -Indexes

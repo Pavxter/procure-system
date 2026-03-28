@@ -1,0 +1,27 @@
+# Konfiguracija sa pravim podacima
+api/config.php
+
+# Instalacioni skript (briše se posle setup-a)
+api/setup.php
+
+# SQL dump-ovi
+*.sql
+
+# OS fajlovi
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logovi
+*.log
+
+# Interni fajlovi projekta
+CLAUDE.md
+PLAN_RAZVOJA.md
+Koloid_Starter_Pack/
+.claude/

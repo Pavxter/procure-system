@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Koloid — Nabavka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e 0%,#0f3460 100%)}
+.login-box{background:#fff;border-radius:16px;padding:40px 36px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo .logo-k{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#1a1a2e,#0f3460);color:#fff;font-size:28px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px}
+.login-logo h2{font-size:20px;font-weight:700;color:#1a1a2e}
+.login-logo p{font-size:13px;color:#6b7280;margin-top:2px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+.form-group input{width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;font-family:inherit;transition:border-color .2s}
+.form-group input:focus{outline:none;border-color:#0f3460}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:#0f3460;color:#fff}.btn-primary:hover{background:#0d2d54}
+.btn-secondary{background:#f3f4f6;color:#374151;border:1.5px solid #e5e7eb}.btn-secondary:hover{background:#e5e7eb}
+.btn-danger{background:#fee2e2;color:#dc2626;border:1.5px solid #fecaca}.btn-danger:hover{background:#fecaca}
+.btn-success{background:#d1fae5;color:#065f46;border:1.5px solid #a7f3d0}.btn-success:hover{background:#a7f3d0}
+.btn-full{width:100%;justify-content:center;padding:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.login-err{background:#fee2e2;color:#dc2626;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:16px}
+/* HEADER */
+header{background:linear-gradient(90deg,#1a1a2e 0%,#0f3460 100%);color:#fff;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.header-left{display:flex;align-items:center;gap:14px}
+.logo-k{width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.15);color:#fff;font-size:18px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+header h1{font-size:17px;font-weight:700;letter-spacing:-.3px}
+header .subtitle{font-size:12px;opacity:.6;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:12px}
+.user-badge{background:rgba(255,255,255,.12);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:500}
+.user-badge span{opacity:.7;font-size:11px;margin-left:4px}
+.btn-logout{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);padding:6px 14px;font-size:12px}
+.btn-logout:hover{background:rgba(255,255,255,.2)}
+/* TABS */
+.tabs-bar{background:#fff;border-bottom:1px solid #e5e7eb;padding:0 24px;display:flex;gap:2px;overflow-x:auto}
+.tab-btn{padding:14px 18px;font-size:13px;font-weight:600;color:#6b7280;background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;font-family:inherit;transition:color .15s}
+.tab-btn:hover{color:#1a1a2e}
+.tab-btn.active{color:#0f3460;border-bottom-color:#0f3460}
+/* LAYOUT */
+.page{padding:24px;max-width:1400px;margin:0 auto}
+/* CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.stat-card .val{font-size:32px;font-weight:700;color:#0f3460;line-height:1}
+.stat-card .lbl{font-size:12px;color:#6b7280;margin-top:6px;font-weight:500}
+.stat-card.warn .val{color:#d97706}
+.stat-card.danger .val{color:#dc2626}
+.stat-card.ok .val{color:#059669}
+/* SECTION */
+.section{background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-bottom:20px}
+.section-head{padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.section-head h3{font-size:15px;font-weight:700;color:#1a1a2e}
+.section-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f9fafb;padding:10px 14px;text-align:left;font-weight:600;color:#374151;font-size:12px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e5e7eb;white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid #f3f4f6;color:#374151;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.td-actions{display:flex;gap:6px}
+/* BADGE */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-ok{background:#d1fae5;color:#065f46}
+.badge-warn{background:#fef3c7;color:#92400e}
+.badge-danger{background:#fee2e2;color:#991b1b}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-gray{background:#f3f4f6;color:#374151}
+.badge-purple{background:#ede9fe;color:#5b21b6}
+/* SEARCH */
+.search-input{padding:8px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;font-family:inherit;width:220px}
+.search-input:focus{outline:none;border-color:#0f3460}
+select.filter-sel{padding:8px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;font-family:inherit;background:#fff}
+select.filter-sel:focus{outline:none;border-color:#0f3460}
+/* STARS */
+.stars{display:inline-flex;gap:2px}
+.star{font-size:14px;cursor:default}
+.star.on{color:#f59e0b}
+.star.off{color:#d1d5db}
+.stars.clickable .star{cursor:pointer}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-wide{max-width:700px}
+.modal-head{padding:20px 24px 16px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.modal-head h3{font-size:16px;font-weight:700}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#6b7280;line-height:1;padding:2px 6px}
+.modal-close:hover{color:#1a1a2e}
+.modal-body{padding:20px 24px}
+.modal-foot{padding:16px 24px;border-top:1px solid #f3f4f6;display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:#fff}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:9px 13px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#0f3460}
+.field textarea{resize:vertical;min-height:72px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+/* TOAST */
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:#1a1a2e;color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.25);max-width:320px;display:flex;align-items:center;gap:10px;animation:slideIn .2s ease}
+.toast.ok{background:#065f46;border-left:4px solid #34d399}
+.toast.err{background:#7f1d1d;border-left:4px solid #f87171}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+/* CARDS GRID (dobavljaci, ugovori) */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:20px}
+.card{background:#fff;border:1.5px solid #e5e7eb;border-radius:12px;padding:18px;transition:box-shadow .15s}
+.card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.card-title{font-size:15px;font-weight:700;color:#1a1a2e}
+.card-sub{font-size:12px;color:#6b7280;margin-top:2px}
+.card-info{font-size:12px;color:#374151;line-height:1.8}
+.card-info b{color:#1a1a2e}
+.card-foot{margin-top:14px;padding-top:12px;border-top:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between}
+/* KONTROLING */
+.kontrol-grid{padding:20px;display:grid;gap:20px}
+.kontrol-card{background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:12px;overflow:hidden}
+.kontrol-card-head{background:linear-gradient(90deg,#1a1a2e,#0f3460);color:#fff;padding:12px 18px;font-size:14px;font-weight:700}
+.kontrol-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:#e5e7eb}
+.kontrol-field{background:#fff;padding:12px 14px}
+.kontrol-field label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;display:block;margin-bottom:6px}
+.kontrol-field textarea{width:100%;border:1.5px solid #e5e7eb;border-radius:6px;padding:8px;font-size:12px;font-family:inherit;resize:vertical;min-height:60px;transition:border-color .2s}
+.kontrol-field textarea:focus{outline:none;border-color:#0f3460}
+.kontrol-field textarea.saving{border-color:#f59e0b}
+.kontrol-field textarea.saved{border-color:#059669}
+/* PLAN NABAVKE */
+.plan-table-wrap{overflow-x:auto;padding:0}
+.plan-table{min-width:1400px}
+.plan-table th,.plan-table td{padding:8px 10px;font-size:12px}
+.plan-table input[type=number]{width:70px;padding:4px 6px;border:1.5px solid #e5e7eb;border-radius:5px;font-size:12px;font-family:inherit;text-align:right}
+.plan-table input[type=number]:focus{outline:none;border-color:#0f3460}
+.plan-input-wrap{display:flex;flex-direction:column;gap:3px}
+.plan-real{font-size:11px;color:#059669;font-weight:600}
+.plan-pct{font-size:11px}
+.plan-pct.over{color:#059669}
+.plan-pct.under{color:#dc2626}
+.year-sel{padding:7px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;font-family:inherit}
+/* UGOVORI */
+.status-potpisan{border-left:4px solid #059669}
+.status-u_pregovorima{border-left:4px solid #d97706}
+.status-nema_ugovor{border-left:4px solid #dc2626}
+.status-istekao{border-left:4px solid #6b7280}
+/* RADAR SVG */
+.radar-wrap{width:120px;height:120px;flex-shrink:0}
+/* PRIORITY */
+.prio-1{color:#6b7280}.prio-2{color:#d97706}.prio-3{color:#dc2626}
+/* ACTIVITY */
+.activity-list{padding:4px 0}
+.activity-item{padding:10px 20px;border-bottom:1px solid #f3f4f6;font-size:13px;display:flex;align-items:center;gap:10px}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.activity-dot.CREATE{background:#059669}
+.activity-dot.UPDATE{background:#2563eb}
+.activity-dot.DELETE{background:#dc2626}
+.activity-dot.LOGIN,.activity-dot.LOGOUT{background:#7c3aed}
+.activity-time{color:#9ca3af;font-size:11px;margin-left:auto;white-space:nowrap}
+/* EMPTY STATE */
+.empty{text-align:center;padding:48px 24px;color:#9ca3af}
+.empty-icon{font-size:40px;margin-bottom:12px}
+/* RESPONSIVE */
+@media(max-width:600px){
+  .field-row,.field-row3{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .cards-grid{grid-template-columns:1fr}
+  .page{padding:16px}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef } = React;
+
+// ============================================================
+// API HELPER
+// ============================================================
+async function api(url, options = {}) {
+  const res = await fetch(url, {
+    headers: { 'Content-Type': 'application/json', ...options.headers },
+    credentials: 'same-origin',
+    ...options,
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+let _toastCb = null;
+function useToasts() {
+  const [toasts, setToasts] = useState([]);
+  _toastCb = useCallback((msg, type = 'ok') => {
+    const id = Date.now();
+    setToasts(t => [...t, { id, msg, type }]);
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3200);
+  }, []);
+  return toasts;
+}
+function toast(msg, type) { _toastCb && _toastCb(msg, type); }
+
+// ============================================================
+// HELPERS
+// ============================================================
+function Stars({ value, max = 5, onClick }) {
+  return (
+    <span className={'stars' + (onClick ? ' clickable' : '')}>
+      {Array.from({ length: max }, (_, i) => (
+        <span key={i} className={'star ' + (i < value ? 'on' : 'off')}
+          onClick={() => onClick && onClick(i + 1)}>★</span>
+      ))}
+    </span>
+  );
+}
+
+function StatusBadge({ stanje, minimum }) {
+  if (stanje === 0 || stanje < minimum * 0.5) return <span className="badge badge-danger">Kriticno</span>;
+  if (stanje < minimum) return <span className="badge badge-warn">Nisko</span>;
+  return <span className="badge badge-ok">OK</span>;
+}
+
+function NarudzbinaStatus({ status }) {
+  const map = { naruceno: ['badge-blue','Naruceno'], cekanje: ['badge-warn','Cekanje'],
+                isporuceno: ['badge-ok','Isporuceno'], otkazano: ['badge-gray','Otkazano'] };
+  const [cls, lbl] = map[status] || ['badge-gray', status];
+  return <span className={`badge ${cls}`}>{lbl}</span>;
+}
+
+function UgovorStatus({ status }) {
+  const map = { potpisan: ['badge-ok','Potpisan'], u_pregovorima: ['badge-warn','U pregovorima'],
+                nema_ugovor: ['badge-danger','Nema ugovora'], istekao: ['badge-gray','Istekao'] };
+  const [cls, lbl] = map[status] || ['badge-gray', status];
+  return <span className={`badge ${cls}`}>{lbl}</span>;
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('sr-RS');
+}
+
+function fmtNum(n) {
+  if (n == null) return '—';
+  return parseFloat(n).toLocaleString('sr-RS');
+}
+
+function csvExport(rows, cols, filename) {
+  const BOM = '\uFEFF';
+  const header = cols.map(c => c.label).join(';');
+  const body = rows.map(r => cols.map(c => {
+    const v = c.fn ? c.fn(r) : (r[c.key] ?? '');
+    return `"${String(v).replace(/"/g, '""')}"`;
+  }).join(';')).join('\n');
+  const blob = new Blob([BOM + header + '\n' + body], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+// ============================================================
+// CONFIRM MODAL
+// ============================================================
+function ConfirmModal({ msg, onOk, onCancel }) {
+  return (
+    <div className="modal-overlay" onClick={onCancel}>
+      <div className="modal" style={{maxWidth:380}} onClick={e => e.stopPropagation()}>
+        <div className="modal-head"><h3>Potvrda</h3><button className="modal-close" onClick={onCancel}>×</button></div>
+        <div className="modal-body"><p style={{fontSize:14}}>{msg}</p></div>
+        <div className="modal-foot">
+          <button className="btn btn-secondary" onClick={onCancel}>Otkaži</button>
+          <button className="btn btn-danger" onClick={onOk}>Obriši</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function Dashboard({ user }) {
+  const [stats, setStats] = useState(null);
+  const [log, setLog] = useState([]);
+
+  async function load() {
+    try {
+      const [s, l] = await Promise.all([
+        api('api/data.php?entity=stats'),
+        api('api/data.php?entity=activity_log&limit=15'),
+      ]);
+      setStats(s);
+      setLog(l);
+    } catch(e) { toast(e.message, 'err'); }
+  }
+
+  useEffect(() => { load(); }, []);
+
+  if (!stats) return <div className="page"><p>Ucitavanje...</p></div>;
+
+  return (
+    <div className="page">
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="val">{stats.totalSirovine}</div>
+          <div className="lbl">Ukupno sirovina</div>
+        </div>
+        <div className={'stat-card ' + (stats.kriticneSirovine > 0 ? 'danger' : 'ok')}>
+          <div className="val">{stats.kriticneSirovine}</div>
+          <div className="lbl">Kriticne sirovine</div>
+        </div>
+        <div className={'stat-card ' + (stats.aktivneNarudzbine > 0 ? 'warn' : '')}>
+          <div className="val">{stats.aktivneNarudzbine}</div>
+          <div className="lbl">Aktivne narudzbine</div>
+        </div>
+        <div className="stat-card">
+          <div className="val">{stats.totalDobavljaci}</div>
+          <div className="lbl">Dobavljaci</div>
+        </div>
+        <div className={'stat-card ' + (stats.potpisaniUgovori < stats.totalUgovori ? 'warn' : 'ok')}>
+          <div className="val">{stats.potpisaniUgovori}<span style={{fontSize:16,opacity:.5}}>/{stats.totalUgovori}</span></div>
+          <div className="lbl">Potpisani ugovori</div>
+        </div>
+      </div>
+
+      <div className="section" style={{marginBottom:20}}>
+        <div className="section-head">
+          <h3>Kriticne sirovine</h3>
+          <button className="btn btn-secondary" onClick={load}>Osvezi</button>
+        </div>
+        {stats.kriticneDetalji.length === 0
+          ? <div className="empty"><div className="empty-icon">✅</div><p>Nema kriticnih sirovina</p></div>
+          : <div className="table-wrap">
+              <table>
+                <thead><tr>
+                  <th>Naziv</th><th>Kategorija</th><th>Stanje</th><th>Minimum</th><th>JM</th><th>Dobavljac</th><th>Status</th>
+                </tr></thead>
+                <tbody>
+                  {stats.kriticneDetalji.map(s => (
+                    <tr key={s.id}>
+                      <td style={{fontWeight:600}}>{s.naziv}</td>
+                      <td>{s.kategorija || '—'}</td>
+                      <td style={{fontWeight:700,color:s.nivo==='kriticno'?'#dc2626':'#d97706'}}>{fmtNum(s.stanje)}</td>
+                      <td>{fmtNum(s.minimum)}</td>
+                      <td>{s.jm}</td>
+                      <td>{s.dobavljac_naziv || '—'}</td>
+                      <td><span className={'badge ' + (s.nivo==='kriticno'?'badge-danger':'badge-warn')}>{s.nivo==='kriticno'?'Kriticno':'Nisko'}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+        }
+      </div>
+
+      <div className="section">
+        <div className="section-head"><h3>Poslednje aktivnosti</h3></div>
+        <div className="activity-list">
+          {log.length === 0 && <div className="empty"><p>Nema aktivnosti</p></div>}
+          {log.map(l => (
+            <div key={l.id} className="activity-item">
+              <span className={'activity-dot ' + l.akcija}></span>
+              <span style={{fontWeight:600}}>{l.korisnik}</span>
+              <span style={{color:'#6b7280'}}>{l.akcija}</span>
+              <span>{l.detalji}</span>
+              <span className="activity-time">{new Date(l.created_at).toLocaleString('sr-RS')}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// SIROVINE
+// ============================================================
+const JM_OPTIONS = ['kg','g','L','mL','kom','m','m2','m3','t'];
+
+// ============================================================
+// UPRAVLJANJE KATEGORIJAMA
+// ============================================================
+function KategorijeModal({ user, onClose, onChange }) {
+  const [kategorije, setKategorije] = useState([]);
+  const [novi, setNovi] = useState('');
+  const [saving, setSaving] = useState(false);
+  const canDelete = user.uloga === 'admin';
+
+  async function load() {
+    try { setKategorije(await api('api/data.php?entity=kategorije')); }
+    catch(e) { toast(e.message, 'err'); }
+  }
+
+  useEffect(() => { load(); }, []);
+
+  async function dodaj(e) {
+    e.preventDefault();
+    if (!novi.trim()) return;
+    setSaving(true);
+    try {
+      const k = await api('api/data.php?entity=kategorije', { method:'POST', body:{ naziv: novi.trim() } });
+      const updated = [...kategorije, k].sort((a,b) => a.naziv.localeCompare(b.naziv));
+      setKategorije(updated);
+      onChange(updated);
+      setNovi('');
+      toast('Kategorija dodana');
+    } catch(e) { toast(e.message, 'err'); } finally { setSaving(false); }
+  }
+
+  async function obrisi(id, naziv) {
+    try {
+      await api(`api/data.php?entity=kategorije&id=${id}`, { method:'DELETE' });
+      const updated = kategorije.filter(k => k.id !== id);
+      setKategorije(updated);
+      onChange(updated);
+      toast(`"${naziv}" obrisana`);
+    } catch(e) { toast(e.message, 'err'); }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:400}} onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <h3>Kategorije sirovina</h3>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+        <div className="modal-body">
+          <form onSubmit={dodaj} style={{display:'flex',gap:8,marginBottom:16}}>
+            <input
+              className="search-input" style={{flex:1}}
+              placeholder="Nova kategorija..."
+              value={novi} onChange={e => setNovi(e.target.value)}
+            />
+            <button type="submit" className="btn btn-primary" disabled={saving}>Dodaj</button>
+          </form>
+          <div style={{border:'1px solid #e5e7eb',borderRadius:8,overflow:'hidden'}}>
+            {kategorije.length === 0 && <div style={{padding:'20px',textAlign:'center',color:'#9ca3af',fontSize:13}}>Nema kategorija</div>}
+            {kategorije.map((k, i) => (
+              <div key={k.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'10px 14px',borderBottom: i < kategorije.length-1 ? '1px solid #f3f4f6' : 'none'}}>
+                <span style={{fontSize:14}}>{k.naziv}</span>
+                {canDelete && <button className="btn btn-danger" style={{padding:'4px 10px',fontSize:12}} onClick={() => obrisi(k.id, k.naziv)}>Obriši</button>}
+              </div>
+            ))}
+          </div>
+          {!canDelete && <p style={{fontSize:12,color:'#9ca3af',marginTop:8}}>Brisanje kategorija može samo admin.</p>}
+        </div>
+        <div className="modal-foot">
+          <button className="btn btn-primary" onClick={onClose}>Zatvori</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SirovineModal({ item, dobavljaci, kategorije, onSave, onClose }) {
+  const [form, setForm] = useState({
+    naziv: item?.naziv || '',
+    kategorija: item?.kategorija || '',
+    jm: item?.jm || 'kg',
+    stanje: item?.stanje ?? 0,
+    minimum: item?.minimum ?? 0,
+    cena: item?.cena ?? 0,
+    dobavljacId: item?.dobavljac_id || '',
+    napomena: item?.napomena || '',
+  });
+  const [saving, setSaving] = useState(false);
+
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  async function submit(e) {
+    e.preventDefault();
+    if (!form.naziv.trim()) { toast('Naziv je obavezan', 'err'); return; }
+    setSaving(true);
+    try {
+      const payload = { ...form, dobavljacId: form.dobavljacId || null };
+      if (item) {
+        const r = await api(`api/data.php?entity=sirovine&id=${item.id}`, { method:'PUT', body: payload });
+        onSave(r);
+      } else {
+        const r = await api('api/data.php?entity=sirovine', { method:'POST', body: payload });
+        onSave(r);
+      }
+      toast(item ? 'Sirovina azurirana' : 'Sirovina dodana');
+      onClose();
+    } catch(e) { toast(e.message, 'err'); } finally { setSaving(false); }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <h3>{item ? 'Izmeni sirovinu' : 'Dodaj sirovinu'}</h3>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+        <form onSubmit={submit}>
+          <div className="modal-body">
+            <div className="field">
+              <label>Naziv *</label>
+              <input value={form.naziv} onChange={e => set('naziv', e.target.value)} autoFocus />
+            </div>
+            <div className="field-row">
+              <div className="field">
+                <label>Kategorija</label>
+                <select value={form.kategorija} onChange={e => set('kategorija', e.target.value)}>
+                  <option value="">— Izaberi —</option>
+                  {kategorije.map(k => <option key={k.id} value={k.naziv}>{k.naziv}</option>)}
+                </select>
+              </div>
+              <div className="field">
+                <label>Jedinica mere</label>
+                <select value={form.jm} onChange={e => set('jm', e.target.value)}>
+                  {JM_OPTIONS.map(j => <option key={j}>{j}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="field-row3">
+              <div className="field">
+                <label>Stanje</label>
+                <input type="number" step="0.01" min="0" value={form.stanje} onChange={e => set('stanje', e.target.value)} />
+              </div>
+              <div className="field">
+                <label>Minimum</label>
+                <input type="number" step="0.01" min="0" value={form.minimum} onChange={e => set('minimum', e.target.value)} />
+              </div>
+              <div className="field">
+                <label>Cena (RSD)</label>
+                <input type="number" step="0.01" min="0" value={form.cena} onChange={e => set('cena', e.target.value)} />
+              </div>
+            </div>
+            <div className="field">
+              <label>Dobavljac</label>
+              <select value={form.dobavljacId} onChange={e => set('dobavljacId', e.target.value)}>
+                <option value="">— Nema / odaberi —</option>
+                {dobavljaci.map(d => <option key={d.id} value={d.id}>{d.naziv}</option>)}
+              </select>
+            </div>
+            <div className="field">
+              <label>Napomena</label>
+              <textarea value={form.napomena} onChange={e => set('napomena', e.target.value)} />
+            </div>
+          </div>
+          <div className="modal-foot">
+            <button type="button" className="btn btn-secondary" onClick={onClose}>Otkaži</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Cuvanje...' : 'Sacuvaj'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// SIROVINE — CSV UVOZ
+// ============================================================
+const IMPORT_COLS = ['naziv','kategorija','jm','stanje','minimum','cena','napomena'];
+
+function parseCSV(text) {
+  // Ukloni BOM
+  text = text.replace(/^\uFEFF/, '');
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) return { error: 'Fajl je prazan ili nema podataka.' };
+
+  // Auto-detect separator (; ili ,)
+  const sep = lines[0].includes(';') ? ';' : ',';
+
+  function splitLine(line) {
+    const result = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === sep && !inQ) { result.push(cur.trim()); cur = ''; }
+      else { cur += ch; }
+    }
+    result.push(cur.trim());
+    return result;
+  }
+
+  const headers = splitLine(lines[0]).map(h => h.toLowerCase().replace(/[^a-z_]/g,''));
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = splitLine(lines[i]);
+    if (vals.every(v => !v)) continue;
+    const row = {};
+    headers.forEach((h, idx) => { row[h] = vals[idx] || ''; });
+    rows.push(row);
+  }
+  return { headers, rows };
+}
+
+function downloadTemplate() {
+  const BOM = '\uFEFF';
+  const header = 'naziv;kategorija;jm;stanje;minimum;cena;napomena';
+  const example = 'Natrijum hidroksid;Hemikalije;kg;150;100;85;Test napomena';
+  const blob = new Blob([BOM + header + '\n' + example], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'template_sirovine.csv';
+  a.click();
+}
+
+function ImportModal({ dobavljaci, onImported, onClose }) {
+  const [parsed, setParsed] = useState(null);
+  const [error, setError] = useState('');
+  const [progress, setProgress] = useState(null); // null | { done, total, errors }
+  const [done, setDone] = useState(false);
+
+  function onFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const result = parseCSV(ev.target.result);
+      if (result.error) { setError(result.error); setParsed(null); return; }
+      if (!result.rows.some(r => r.naziv)) { setError('Kolona "naziv" nije pronadjena ili je prazna. Proveri format.'); setParsed(null); return; }
+      setError('');
+      setParsed(result);
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  async function doImport() {
+    if (!parsed) return;
+    const valid = parsed.rows.filter(r => r.naziv && r.naziv.trim());
+    setProgress({ done: 0, total: valid.length, errors: [] });
+    let errors = [];
+    let imported = [];
+    for (let i = 0; i < valid.length; i++) {
+      const r = valid[i];
+      try {
+        const saved = await api('api/data.php?entity=sirovine', {
+          method: 'POST',
+          body: {
+            naziv: r.naziv.trim(),
+            kategorija: r.kategorija || '',
+            jm: r.jm || 'kg',
+            stanje: parseFloat(r.stanje) || 0,
+            minimum: parseFloat(r.minimum) || 0,
+            cena: parseFloat(r.cena) || 0,
+            napomena: r.napomena || '',
+          }
+        });
+        imported.push(saved);
+      } catch(e) {
+        errors.push(`Red ${i+2}: ${r.naziv} — ${e.message}`);
+      }
+      setProgress({ done: i + 1, total: valid.length, errors });
+    }
+    setDone(true);
+    onImported(imported);
+    toast(`Uvezeno ${imported.length} sirovina${errors.length ? ', ' + errors.length + ' gresaka' : ''}.`, errors.length ? 'err' : 'ok');
+  }
+
+  const valid = parsed ? parsed.rows.filter(r => r.naziv && r.naziv.trim()) : [];
+
+  return (
+    <div className="modal-overlay" onClick={done ? onClose : undefined}>
+      <div className="modal modal-wide" onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <h3>Uvoz sirovina iz CSV</h3>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+        <div className="modal-body">
+          {!progress && <>
+            <div style={{background:'#f0f9ff',border:'1px solid #bae6fd',borderRadius:8,padding:'12px 14px',marginBottom:16,fontSize:13}}>
+              <b>Ocekivane kolone:</b> naziv, kategorija, jm, stanje, minimum, cena, napomena<br/>
+              <b>Separator:</b> ; (tacka-zarez) ili , (zarez) — auto-detect<br/>
+              <b>Kodovanje:</b> UTF-8 (sacuvaj iz Excela kao "CSV UTF-8")<br/>
+              <button className="btn btn-secondary" style={{marginTop:8}} onClick={downloadTemplate}>Preuzmi template</button>
+            </div>
+            <div className="field">
+              <label>Izaberi CSV fajl</label>
+              <input type="file" accept=".csv,text/csv" onChange={onFile} style={{padding:'8px 0'}} />
+            </div>
+            {error && <div style={{background:'#fee2e2',color:'#991b1b',borderRadius:8,padding:'10px 14px',fontSize:13}}>{error}</div>}
+            {parsed && valid.length > 0 && <>
+              <div style={{fontSize:13,color:'#065f46',background:'#d1fae5',borderRadius:8,padding:'8px 14px',marginBottom:12}}>
+                Pronadjeno <b>{valid.length}</b> validnih redova za uvoz{parsed.rows.length > valid.length ? ` (${parsed.rows.length - valid.length} preskoceno — bez naziva)` : ''}.
+              </div>
+              <div style={{overflowX:'auto',maxHeight:260,overflowY:'auto',border:'1px solid #e5e7eb',borderRadius:8}}>
+                <table style={{width:'100%',borderCollapse:'collapse',fontSize:12}}>
+                  <thead style={{position:'sticky',top:0,background:'#f9fafb'}}>
+                    <tr>{['naziv','kategorija','jm','stanje','minimum','cena','napomena'].map(c => <th key={c} style={{padding:'8px 10px',textAlign:'left',borderBottom:'1px solid #e5e7eb',fontWeight:700,color:'#374151'}}>{c}</th>)}</tr>
+                  </thead>
+                  <tbody>
+                    {valid.slice(0,50).map((r, i) => (
+                      <tr key={i} style={{borderBottom:'1px solid #f3f4f6'}}>
+                        <td style={{padding:'6px 10px',fontWeight:600}}>{r.naziv}</td>
+                        <td style={{padding:'6px 10px'}}>{r.kategorija||'—'}</td>
+                        <td style={{padding:'6px 10px'}}>{r.jm||'kg'}</td>
+                        <td style={{padding:'6px 10px'}}>{r.stanje||0}</td>
+                        <td style={{padding:'6px 10px'}}>{r.minimum||0}</td>
+                        <td style={{padding:'6px 10px'}}>{r.cena||0}</td>
+                        <td style={{padding:'6px 10px',color:'#6b7280'}}>{r.napomena||''}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {valid.length > 50 && <p style={{fontSize:12,color:'#6b7280',marginTop:6}}>Prikazano prvih 50 od {valid.length} redova.</p>}
+            </>}
+          </>}
+          {progress && <>
+            <div style={{marginBottom:16}}>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:13,marginBottom:6}}>
+                <span>Uvoz u toku...</span>
+                <span style={{fontWeight:700}}>{progress.done}/{progress.total}</span>
+              </div>
+              <div style={{background:'#e5e7eb',borderRadius:20,height:8}}>
+                <div style={{background:'#0f3460',borderRadius:20,height:8,width:`${Math.round(progress.done/progress.total*100)}%`,transition:'width .2s'}} />
+              </div>
+            </div>
+            {done && <>
+              <div style={{fontSize:13,color:'#065f46',background:'#d1fae5',borderRadius:8,padding:'10px 14px',marginBottom:progress.errors.length?12:0}}>
+                Uvezeno <b>{progress.done - progress.errors.length}</b> sirovina.
+              </div>
+              {progress.errors.length > 0 && <div style={{fontSize:12,color:'#991b1b',background:'#fee2e2',borderRadius:8,padding:'10px 14px',marginTop:8}}>
+                <b>Greske ({progress.errors.length}):</b>
+                {progress.errors.map((e,i) => <div key={i}>{e}</div>)}
+              </div>}
+            </>}
+          </>}
+        </div>
+        <div className="modal-foot">
+          <button className="btn btn-secondary" onClick={onClose}>{done ? 'Zatvori' : 'Otkaži'}</button>
+          {!progress && parsed && valid.length > 0 && (
+            <button className="btn btn-primary" onClick={doImport}>Uvezi {valid.length} sirovina</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Sirovine({ user }) {
+  const [rows, setRows] = useState([]);
+  const [dobavljaci, setDobavljaci] = useState([]);
+  const [kategorije, setKategorije] = useState([]);
+  const [search, setSearch] = useState('');
+  const [kat, setKat] = useState('');
+  const [modal, setModal] = useState(null); // null | 'add' | item
+  const [confirm, setConfirm] = useState(null);
+  const [importModal, setImportModal] = useState(false);
+  const [katModal, setKatModal] = useState(false);
+  const canEdit = user.uloga !== 'viewer';
+
+  async function load() {
+    try {
+      const [r, d, k] = await Promise.all([
+        api(`api/data.php?entity=sirovine${search ? '&search=' + encodeURIComponent(search) : ''}${kat ? '&kategorija=' + encodeURIComponent(kat) : ''}`),
+        api('api/data.php?entity=dobavljaci'),
+        api('api/data.php?entity=kategorije'),
+      ]);
+      setRows(r); setDobavljaci(d); setKategorije(k);
+    } catch(e) { toast(e.message, 'err'); }
+  }
+
+  useEffect(() => { load(); }, [search, kat]);
+
+  function onSave(saved) {
+    setRows(prev => {
+      const idx = prev.findIndex(r => r.id === saved.id);
+      if (idx >= 0) { const n = [...prev]; n[idx] = saved; return n; }
+      return [saved, ...prev];
+    });
+  }
+
+  async function doDelete(id) {
+    try {
+      await api(`api/data.php?entity=sirovine&id=${id}`, { method:'DELETE' });
+      setRows(r => r.filter(x => x.id !== id));
+      toast('Sirovina obrisana');
+    } catch(e) { toast(e.message, 'err'); }
+    setConfirm(null);
+  }
+
+  function doExport() {
+    csvExport(rows, [
+      { key:'naziv', label:'Naziv' },
+      { key:'kategorija', label:'Kategorija' },
+      { key:'jm', label:'JM' },
+      { key:'stanje', label:'Stanje' },
+      { key:'minimum', label:'Minimum' },
+      { key:'cena', label:'Cena' },
+      { key:'dobavljac_naziv', label:'Dobavljac' },
+      { key:'napomena', label:'Napomena' },
+    ], 'sirovine.csv');
+  }
+
+  return (
+    <div className="page">
+      <div className="section">
+        <div className="section-head">
+          <h3>Sirovine ({rows.length})</h3>
+          <div className="section-actions">
+            <input className="search-input" placeholder="Pretraga..." value={search} onChange={e => setSearch(e.target.value)} />
+            <select className="filter-sel" value={kat} onChange={e => setKat(e.target.value)}>
+              <option value="">Sve kategorije</option>
+              {kategorije.map(k => <option key={k.id} value={k.naziv}>{k.naziv}</option>)}
+            </select>
+            <button className="btn btn-secondary" onClick={doExport}>Izvezi CSV</button>
+            {canEdit && <button className="btn btn-secondary" onClick={() => setImportModal(true)}>Uvezi CSV</button>}
+            {canEdit && <button className="btn btn-secondary" onClick={() => setKatModal(true)}>Kategorije</button>}
+            {canEdit && <button className="btn btn-primary" onClick={() => setModal('add')}>+ Dodaj</button>}
+          </div>
+        </div>
+        <div className="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Naziv</th><th>Kategorija</th><th>JM</th><th>Stanje</th><th>Minimum</th><th>Cena</th><th>Dobavljac</th><th>Status</th>
+              {canEdit && <th>Akcije</th>}
+            </tr></thead>
+            <tbody>
+              {rows.length === 0 && <tr><td colSpan={9} style={{textAlign:'center',color:'#9ca3af',padding:'32px'}}>Nema sirovina</td></tr>}
+              {rows.map(r => (
+                <tr key={r.id}>
+                  <td style={{fontWeight:600}}>{r.naziv}</td>
+                  <td>{r.kategorija || '—'}</td>
+                  <td>{r.jm}</td>
+                  <td style={{fontWeight:600}}>{fmtNum(r.stanje)}</td>
+                  <td>{fmtNum(r.minimum)}</td>
+                  <td>{r.cena > 0 ? fmtNum(r.cena) + ' RSD' : '—'}</td>
+                  <td>{r.dobavljac_naziv || '—'}</td>
+                  <td><StatusBadge stanje={parseFloat(r.stanje)} minimum={parseFloat(r.minimum)} /></td>
+                  {canEdit && (
+                    <td><div className="td-actions">
+                      <button className="btn btn-secondary" onClick={() => setModal(r)}>Izmeni</button>
+                      <button className="btn btn-danger" onClick={() => setConfirm(r)}>Briši</button>
+                    </div></td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {modal && <SirovineModal item={modal === 'add' ? null : modal} dobavljaci={dobavljaci} kategorije={kategorije} onSave={onSave} onClose={() => setModal(null)} />}
+      {confirm && <ConfirmModal msg={`Obrisati sirovinu "${confirm.naziv}"?`} onOk={() => doDelete(confirm.id)} onCancel={() => setConfirm(null)} />}
+      {importModal && <ImportModal dobavljaci={dobavljaci} onImported={imported => { setRows(prev => [...imported, ...prev]); setImportModal(false); }} onClose={() => setImportModal(false)} />}
+      {katModal && <KategorijeModal user={user} onClose={() => setKatModal(false)} onChange={updated => setKategorije(updated)} />}
+    </div>
+  );
+}
+
+// ============================================================
+// DOBAVLJACI
+// ============================================================
+const OCENA_KRIT = [
+  { key:'ocena_kvalitet', lbl:'Kvalitet' },
+  { key:'ocena_cena',     lbl:'Cena' },
+  { key:'ocena_rokovi',   lbl:'Rokovi' },
+  { key:'ocena_placanje', lbl:'Placanje' },
+  { key:'ocena_reklamacije', lbl:'Reklamacije' },
+];
+
+function RadarChart({ values }) {
+  const n = values.length;
+  const cx = 60, cy = 60, r = 48;
+  function point(i, val) {
+    const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+    const rr = r * val / 5;
+    return [cx + rr * Math.cos(angle), cy + rr * Math.sin(angle)];
+  }
+  const pts = values.map((v, i) => point(i, v));
+  const polygon = pts.map(p => p.join(',')).join(' ');
+  const axes = values.map((_, i) => { const p = point(i, 5); return <line key={i} x1={cx} y1={cy} x2={p[0]} y2={p[1]} stroke="#e5e7eb" strokeWidth="1" />; });
+  return (
+    <svg className="radar-wrap" viewBox="0 0 120 120">
+      {[1,2,3,4,5].map(lvl => {
+        const ps = values.map((_, i) => point(i, lvl));
+        return <polygon key={lvl} points={ps.map(p => p.join(',')).join(' ')} fill="none" stroke="#e5e7eb" strokeWidth="0.5" />;
+      })}
+      {axes}
+      <polygon points={polygon} fill="rgba(15,52,96,0.15)" stroke="#0f3460" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function DobavljacModal({ item, onSave, onClose }) {
+  const init = {
+    naziv: item?.naziv || '',
+    kontakt_osoba: item?.kontakt_osoba || '',
+    telefon: item?.telefon || '',
+    email: item?.email || '',
+    adresa: item?.adresa || '',
+    ugovor: item?.ugovor ? '1' : '0',
+    napomena: item?.napomena || '',
+    ocena_kvalitet: item?.ocena_kvalitet ?? 3,
+    ocena_cena: item?.ocena_cena ?? 3,
+    ocena_rokovi: item?.ocena_rokovi ?? 3,
+    ocena_placanje: item?.ocena_placanje ?? 3,
+    ocena_reklamacije: item?.ocena_reklamacije ?? 3,
+  };
+  const [form, setForm] = useState(init);
+  const [saving, setSaving] = useState(false);
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const avgOcena = Math.round(OCENA_KRIT.reduce((s, k) => s + parseInt(form[k.key] || 3), 0) / OCENA_KRIT.length);
+
+  async function submit(e) {
+    e.preventDefault();
+    if (!form.naziv.trim()) { toast('Naziv je obavezan', 'err'); return; }
+    setSaving(true);
+    try {
+      const payload = { ...form, ocena: avgOcena, ugovor: parseInt(form.ugovor) };
+      let r;
+      if (item) {
+        r = await api(`api/data.php?entity=dobavljaci&id=${item.id}`, { method:'PUT', body: payload });
+      } else {
+        r = await api('api/data.php?entity=dobavljaci', { method:'POST', body: payload });
+      }
+      onSave(r);
+      toast(item ? 'Dobavljac azuriran' : 'Dobavljac dodat');
+      onClose();
+    } catch(e) { toast(e.message, 'err'); } finally { setSaving(false); }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal modal-wide" onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <h3>{item ? 'Izmeni dobavljaca' : 'Dodaj dobavljaca'}</h3>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+        <form onSubmit={submit}>
+          <div className="modal-body">
+            <div className="field"><label>Naziv *</label><input value={form.naziv} onChange={e => set('naziv', e.target.value)} autoFocus /></div>
+            <div className="field-row">
+              <div className="field"><label>Kontakt osoba</label><input value={form.kontakt_osoba} onChange={e => set('kontakt_osoba', e.target.value)} /></div>
+              <div className="field"><label>Telefon</label><input value={form.telefon} onChange={e => set('telefon', e.target.value)} /></div>
+            </div>
+            <div className="field-row">
+              <div className="field"><label>Email</label><input type="email" value={form.email} onChange={e => set('email', e.target.value)} /></div>
+              <div className="field"><label>Ugovor</label>
+                <select value={form.ugovor} onChange={e => set('ugovor', e.target.value)}>
+                  <option value="1">Da — ima ugovor</option>
+                  <option value="0">Ne — nema ugovor</option>
+                </select>
+              </div>
+            </div>
+            <div className="field"><label>Adresa</label><input value={form.adresa} onChange={e => set('adresa', e.target.value)} /></div>
+            <div style={{background:'#f9fafb',borderRadius:8,padding:'14px',marginBottom:16}}>
+              <div style={{fontSize:13,fontWeight:700,marginBottom:12}}>Ocenjivanje (ukupno: {avgOcena}/5)</div>
+              <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:10}}>
+                {OCENA_KRIT.map(k => (
+                  <div key={k.key}>
+                    <div style={{fontSize:12,color:'#6b7280',marginBottom:4}}>{k.lbl}</div>
+                    <Stars value={parseInt(form[k.key])} onClick={v => set(k.key, v)} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="field"><label>Napomena</label><textarea value={form.napomena} onChange={e => set('napomena', e.target.value)} /></div>
+          </div>
+          <div className="modal-foot">
+            <button type="button" className="btn btn-secondary" onClick={onClose}>Otkaži</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Cuvanje...' : 'Sacuvaj'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function Dobavljaci({ user }) {
+  const [rows, setRows] = useState([]);
+  const [search, setSearch] = useState('');
+  const [modal, setModal] = useState(null);
+  const [confirm, setConfirm] = useState(null);
+  const canEdit = user.uloga !== 'viewer';
+
+  async function load() {
+    try {
+      const r = await api(`api/data.php?entity=dobavljaci${search ? '&search=' + encodeURIComponent(search) : ''}`);
+      setRows(r);
+    } catch(e) { toast(e.message, 'err'); }
+  }
+
+  useEffect(() => { load(); }, [search]);
+
+  function onSave(saved) {
+    setRows(prev => {
+      const idx = prev.findIndex(r => r.id === saved.id);
+      if (idx >= 0) { const n = [...prev]; n[idx] = saved; return n; }
+      return [saved, ...prev];
+    });
+  }
+
+  async function doDelete(id) {
+    try {
+      await api(`api/data.php?entity=dobavljaci&id=${id}`, { method:'DELETE' });
+      setRows(r => r.filter(x => x.id !== id));
+      toast('Dobavljac obrisan');
+    } catch(e) { toast(e.message, 'err'); }
+    setConfirm(null);
+  }
+
+  function doExport() {
+    csvExport(rows, [
+      { key:'naziv', label:'Naziv' },
+      { key:'kontakt_osoba', label:'Kontakt' },
+      { key:'telefon', label:'Telefon' },
+      { key:'email', label:'Email' },
+      { key:'ocena', label:'Ocena' },
+      { key:'ugovor', label:'Ugovor', fn: r => r.ugovor ? 'Da' : 'Ne' },
+    ], 'dobavljaci.csv');
+  }
+
+  return (
+    <div className="page">
+      <div className="section-head" style={{background:'#fff',borderRadius:12,padding:'16px 20px',marginBottom:16,boxShadow:'0 1px 4px rgba(0,0,0,.06)'}}>
+        <h3 style={{fontSize:15,fontWeight:700}}>Dobavljaci ({rows.length})</h3>
+        <div className="section-actions">
+          <input className="search-input" placeholder="Pretraga..." value={search} onChange={e => setSearch(e.target.value)} />
+          <button className="btn btn-secondary" onClick={doExport}>CSV</button>
+          {canEdit && <button className="btn btn-primary" onClick={() => setModal('add')}>+ Dodaj</button>}
+        </div>
+      </div>
+      {rows.length === 0
+        ? <div className="empty"><div className="empty-icon">🏭</div><p>Nema dobavljaca</p></div>
+        : <div className="cards-grid">
+            {rows.map(r => {
+              const radarVals = OCENA_KRIT.map(k => parseInt(r[k.key] || r.ocena || 3));
+              return (
+                <div key={r.id} className="card">
+                  <div className="card-head">
+                    <div>
+                      <div className="card-title">{r.naziv}</div>
+                      <div className="card-sub">{r.kontakt_osoba || '—'}</div>
+                    </div>
+                    <RadarChart values={radarVals} />
+                  </div>
+                  <div className="card-info">
+                    {r.telefon && <div><b>Tel:</b> {r.telefon}</div>}
+                    {r.email && <div><b>Email:</b> {r.email}</div>}
+                    {r.adresa && <div><b>Adresa:</b> {r.adresa}</div>}
+                    {r.napomena && <div><b>Napomena:</b> {r.napomena}</div>}
+                  </div>
+                  <div className="card-foot">
+                    <div style={{display:'flex',gap:6,alignItems:'center'}}>
+                      <Stars value={parseInt(r.ocena)} />
+                      <span style={{fontSize:12,color:'#6b7280'}}>{r.ocena}/5</span>
+                    </div>
+                    <div style={{display:'flex',gap:6,alignItems:'center'}}>
+                      {r.ugovor ? <span className="badge badge-ok">Ugovor</span> : <span className="badge badge-danger">Bez ugovora</span>}
+                      {canEdit && <>
+                        <button className="btn btn-secondary" style={{padding:'5px 10px'}} onClick={() => setModal(r)}>Izmeni</button>
+                        <button className="btn btn-danger" style={{padding:'5px 10px'}} onClick={() => setConfirm(r)}>Briši</button>
+                      </>}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+      }
+      {modal && <DobavljacModal item={modal === 'add' ? null : modal} onSave={onSave} onClose={() => setModal(null)} />}
+      {confirm && <ConfirmModal msg={`Obrisati dobavljaca "${confirm.naziv}"?`} onOk={() => doDelete(confirm.id)} onCancel={() => setConfirm(null)} />}
+    </div>
+  );
+}
+
+// ============================================================
+// NARUDZBINE
+// ============================================================
+function NarudzbinaModal({ item, sirovine, dobavljaci, onSave, onClose }) {
+  const [form, setForm] = useState({
+    sirovinaId: item?.sirovina_id || '',
+    dobavljacId: item?.dobavljac_id || '',
+    kolicina: item?.kolicina ?? '',
+    cena_po_jm: item?.cena_po_jm ?? 0,
+    status: item?.status || 'naruceno',
+    datum_narucivanja: item?.datum_narucivanja || new Date().toISOString().slice(0,10),
+    datum_isporuke: item?.datum_isporuke || '',
+    napomena: item?.napomena || '',
+  });
+  const [saving, setSaving] = useState(false);
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const ukupno = (parseFloat(form.kolicina) || 0) * (parseFloat(form.cena_po_jm) || 0);
+
+  async function submit(e) {
+    e.preventDefault();
+    if (!form.kolicina || parseFloat(form.kolicina) <= 0) { toast('Kolicina mora biti veca od 0', 'err'); return; }
+    setSaving(true);
+    try {
+      let r;
+      if (item) {
+        r = await api(`api/data.php?entity=narudzbine&id=${item.id}`, { method:'PUT', body: form });
+      } else {
+        r = await api('api/data.php?entity=narudzbine', { method:'POST', body: form });
+      }
+      onSave(r);
+      toast(item ? 'Narudzbina azurirana' : 'Narudzbina kreirana');
+      onClose();
+    } catch(e) { toast(e.message, 'err'); } finally { setSaving(false); }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <h3>{item ? 'Izmeni narudzbinu' : 'Nova narudzbina'}</h3>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+        <form onSubmit={submit}>
+          <div className="modal-body">
+            <div className="field-row">
+              <div className="field"><label>Sirovina</label>
+                <select value={form.sirovinaId} onChange={e => set('sirovinaId', e.target.value)}>
+                  <option value="">— Izaberi —</option>
+                  {sirovine.map(s => <option key={s.id} value={s.id}>{s.naziv} ({s.jm})</option>)}
+                </select>
+              </div>
+              <div className="field"><label>Dobavljac</label>
+                <select value={form.dobavljacId} onChange={e => set('dobavljacId', e.target.value)}>
+                  <option value="">— Izaberi —</option>
+                  {dobavljaci.map(d => <option key={d.id} value={d.id}>{d.naziv}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="field-row3">
+              <div className="field"><label>Kolicina *</label><input type="number" step="0.01" min="0.01" value={form.kolicina} onChange={e => set('kolicina', e.target.value)} /></div>
+              <div className="field"><label>Cena/JM</label><input type="number" step="0.01" min="0" value={form.cena_po_jm} onChange={e => set('cena_po_jm', e.target.value)} /></div>
+              <div className="field"><label>Ukupno</label><input readOnly value={ukupno > 0 ? fmtNum(ukupno) + ' RSD' : '—'} style={{background:'#f9fafb'}} /></div>
+            </div>
+            <div className="field-row">
+              <div className="field"><label>Status</label>
+                <select value={form.status} onChange={e => set('status', e.target.value)}>
+                  <option value="naruceno">Naruceno</option>
+                  <option value="cekanje">Cekanje</option>
+                  <option value="isporuceno">Isporuceno</option>
+                  <option value="otkazano">Otkazano</option>
+                </select>
+              </div>
+              <div className="field"><label>Datum narudzbe</label><input type="date" value={form.datum_narucivanja} onChange={e => set('datum_narucivanja', e.target.value)} /></div>
+            </div>
+            <div className="field"><label>Datum isporuke (ocekivani)</label><input type="date" value={form.datum_isporuke} onChange={e => set('datum_isporuke', e.target.value)} /></div>
+            <div className="field"><label>Napomena</label><textarea value={form.napomena} onChange={e => set('napomena', e.target.value)} /></div>
+          </div>
+          <div className="modal-foot">
+            <button type="button" className="btn btn-secondary" onClick={onClose}>Otkaži</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Cuvanje...' : 'Sacuvaj'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function Narudzbine({ user }) {
+  const [rows, setRows] = useState([]);
+  const [sirovine, setSirovine] = useState([]);
+  const [dobavljaci, setDobavljaci] = useState([]);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [modal, setModal] = useState(null);
+  const [confirm, setConfirm] = useState(null);
+  const canEdit = user.uloga !== 'viewer';
+
+  async function load() {
+    try {
+      const params = new URLSearchParams();
+      if (search) params.set('search', search);
+      if (statusFilter) params.set('status', statusFilter);
+      const [r, s, d] = await Promise.all([
+        api(`api/data.php?entity=narudzbine&${params}`),
+        api('api/data.php?entity=sirovine'),
+        api('api/data.php?entity=dobavljaci'),
+      ]);
+      setRows(r); setSirovine(s); setDobavljaci(d);
+    } catch(e) { toast(e.message, 'err'); }
+  }
+
+  useEffect(() => { load(); }, [search, statusFilter]);
+
+  function onSave(saved) {
+    setRows(prev => {
+      const idx = prev.findIndex(r => r.id === saved.id);
+      if (idx >= 0) { const n = [...prev]; n[idx] = saved; return n; }
+      return [saved, ...prev];
+    });
+  }
+
+  async function doDelete(id) {
+    try {
+      await api(`api/data.php?entity=narudzbine&id=${id}`, { method:'DELETE' });
+      setRows(r => r.filter(x => x.id !== id));
+      toast('Narudzbina obrisana');
+    } catch(e) { toast(e.message, 'err'); }
+    setConfirm(null);
+  }
+
+  function doExport() {
+    csvExport(rows, [
+      { key:'id', label:'ID' },
+      { key:'sirovina_naziv', label:'Sirovina' },
+      { key:'dobavljac_naziv', label:'Dobavljac' },
+      { key:'kolicina', label:'Kolicina' },
+      { key:'jm', label:'JM' },
+      { key:'cena_po_jm', label:'Cena/JM' },
+      { key:'ukupna_cena', label:'Ukupno' },
+      { key:'status', label:'Status' },
+      { key:'datum_narucivanja', label:'Datum narudzbe' },
+      { key:'datum_isporuke', label:'Datum isporuke' },
+    ], 'narudzbine.csv');
+  }
+
+  return (
+    <div className="page">
+      <div className="section">
+        <div className="section-head">
+          <h3>Narudzbine ({rows.length})</h3>
+          <div className="section-actions">
+            <input className="search-input" placeholder="Pretraga..." value={search} onChange={e => setSearch(e.target.value)} />
+            <select className="filter-sel" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+              <option value="">Svi statusi</option>
+              <option value="naruceno">Naruceno</option>
+              <option value="cekanje">Cekanje</option>
+              <option value="isporuceno">Isporuceno</option>
+              <option value="otkazano">Otkazano</option>
+            </select>
+            <button className="btn btn-secondary" onClick={doExport}>CSV</button>
+            {canEdit && <button className="btn btn-primary" onClick={() => setModal('add')}>+ Nova</button>}
+          </div>
+        </div>
+        <div className="table-wrap">
+          <table>
+            <thead><tr>
+              <th>#</th><th>Sirovina</th><th>Dobavljac</th><th>Kolicina</th><th>Cena/JM</th><th>Ukupno</th><th>Status</th><th>Datum narudzbe</th><th>Datum isporuke</th>
+              {canEdit && <th>Akcije</th>}
+            </tr></thead>
+            <tbody>
+              {rows.length === 0 && <tr><td colSpan={10} style={{textAlign:'center',color:'#9ca3af',padding:'32px'}}>Nema narudzbina</td></tr>}
+              {rows.map(r => (
+                <tr key={r.id}>
+                  <td style={{color:'#9ca3af',fontSize:12}}>#{r.id}</td>
+                  <td style={{fontWeight:600}}>{r.sirovina_naziv || '—'}</td>
+                  <td>{r.dobavljac_naziv || '—'}</td>
+                  <td>{fmtNum(r.kolicina)} {r.jm}</td>
+                  <td>{r.cena_po_jm > 0 ? fmtNum(r.cena_po_jm) : '—'}</td>
+                  <td style={{fontWeight:600}}>{r.ukupna_cena > 0 ? fmtNum(r.ukupna_cena) + ' RSD' : '—'}</td>
+                  <td><NarudzbinaStatus status={r.status} /></td>
+                  <td>{fmtDate(r.datum_narucivanja)}</td>
+                  <td>{fmtDate(r.datum_isporuke)}</td>
+                  {canEdit && (
+                    <td><div className="td-actions">
+                      <button className="btn btn-secondary" onClick={() => setModal(r)}>Izmeni</button>
+                      <button className="btn btn-danger" onClick={() => setConfirm(r)}>Briši</button>
+                    </div></td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {modal && <NarudzbinaModal item={modal === 'add' ? null : modal} sirovine={sirovine} dobavljaci={dobavljaci} onSave={onSave} onClose={() => setModal(null)} />}
+      {confirm && <ConfirmModal msg={`Obrisati narudzbinu #${confirm.id}?`} onOk={() => doDelete(confirm.id)} onCancel={() => setConfirm(null)} />}
+    </div>
+  );
+}
+
+// ============================================================
+// KONTROLING
+// ============================================================
+const KONTROLING_OBLASTI = [
+  'Strategija nabavke',
+  'Upravljanje dobavljacima',
+  'Planiranje i prognoziranje',
+  'Upravljanje zalihama',
+  'Procesna efikasnost',
+  'Upravljanje rizicima',
+  'Razvoj i inovacije',
+];
+const KONTROLING_POLJA = [
+  'Sta radimo',
+  'Zasto radimo',
+  'Ko je odgovoran',
+  'Kako merimo',
+  'KPI vrednost',
+  'Cilj do kraja godine',
+  'Trenutni status',
+  'Rok realizacije',
+  'Potrebni resursi',
+  'Napomena',
+];
+
+function KontrolingField({ oblast, polje, initialValue, canEdit }) {
+  const [val, setVal] = useState(initialValue || '');
+  const [state, setState] = useState(''); // '' | 'saving' | 'saved'
+  const timerRef = useRef(null);
+
+  async function save(newVal) {
+    setState('saving');
+    try {
+      await api('api/data.php?entity=kontroling', {
+        method: 'POST',
+        body: { oblast, polje, vrednost: newVal },
+      });
+      setState('saved');
+      setTimeout(() => setState(''), 2000);
+    } catch(e) {
+      toast(e.message, 'err');
+      setState('');
+    }
+  }
+
+  function onBlur() {
+    if (!canEdit) return;
+    save(val);
+  }
+
+  return (
+    <div className="kontrol-field">
+      <label>{polje}</label>
+      <textarea
+        value={val}
+        disabled={!canEdit}
+        onChange={e => setVal(e.target.value)}
+        onBlur={onBlur}
+        className={state === 'saving' ? 'saving' : state === 'saved' ? 'saved' : ''}
+        placeholder={canEdit ? 'Unesi...' : ''}
+      />
+    </div>
+  );
+}
+
+function Kontroling({ user }) {
+  const [data, setData] = useState({});
+  const canEdit = user.uloga !== 'viewer';
+
+  useEffect(() => {
+    api('api/data.php?entity=kontroling')
+      .then(d => setData(d))
+      .catch(e => toast(e.message, 'err'));
+  }, []);
+
+  return (
+    <div className="page">
+      <div className="kontrol-grid">
+        {KONTROLING_OBLASTI.map(oblast => (
+          <div key={oblast} className="kontrol-card">
+            <div className="kontrol-card-head">{oblast}</div>
+            <div className="kontrol-fields">
+              {KONTROLING_POLJA.map(polje => (
+                <KontrolingField
+                  key={oblast + polje}
+                  oblast={oblast}
+                  polje={polje}
+                  initialValue={data[oblast]?.[polje] || ''}
+                  canEdit={canEdit}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      {!canEdit && <p style={{textAlign:'center',color:'#9ca3af',fontSize:13,paddingBottom:24}}>Pristup samo za pregled</p>}
+    </div>
+  );
+}
+
+// ============================================================
+// PLAN NABAVKE
+// ============================================================
+const MESECI = ['Jan','Feb','Mar','Apr','Maj','Jun','Jul','Avg','Sep','Okt','Nov','Dec'];
+
+function PlanNabavke({ user }) {
+  const [rows, setRows] = useState([]);
+  const [sirovine, setSirovine] = useState([]);
+  const [godina, setGodina] = useState(new Date().getFullYear());
+  const [kat, setKat] = useState('');
+  const [showBudzet, setShowBudzet] = useState(false);
+  const canEdit = user.uloga !== 'viewer';
+  const savingRef = useRef({});
+
+  async function load() {
+    try {
+      const [r, s] = await Promise.all([
+        api(`api/data.php?entity=plan_nabavke&godina=${godina}${kat ? '&kategorija='+encodeURIComponent(kat) : ''}`),
+        api('api/data.php?entity=sirovine'),
+      ]);
+      setSirovine(s);
+      // Sve sirovine prikazujemo, sa planom ili bez
+      const planMap = {};
+      r.forEach(p => planMap[p.sirovina_id] = p);
+      const display = s
+        .filter(s => !kat || s.kategorija === kat)
+        .map(s => planMap[s.id] || { sirovina_id: s.id, sirovina_naziv: s.naziv, jm: s.jm, kategorija: s.kategorija, godina });
+      setRows(display);
+    } catch(e) { toast(e.message, 'err'); }
+  }
+
+  useEffect(() => { load(); }, [godina, kat]);
+
+  const timerRef = useRef({});
+
+  function onChange(sirovinaId, field, value) {
+    setRows(prev => prev.map(r => r.sirovina_id === sirovinaId ? { ...r, [field]: value } : r));
+    const key = `${sirovinaId}_${field}`;
+    clearTimeout(timerRef.current[key]);
+    timerRef.current[key] = setTimeout(() => saveRow(sirovinaId), 800);
+  }
+
+  async function saveRow(sirovinaId) {
+    const row = rows.find(r => r.sirovina_id === sirovinaId);
+    if (!row) return;
+    const payload = { sirovinaId, godina };
+    for (let m = 1; m <= 12; m++) {
+      payload[`mesec_${m}`] = parseFloat(row[`mesec_${m}`]) || 0;
+      payload[`budzet_${m}`] = parseFloat(row[`budzet_${m}`]) || 0;
+    }
+    try {
+      await api('api/data.php?entity=plan_nabavke', { method:'POST', body: payload });
+    } catch(e) { toast(e.message, 'err'); }
+  }
+
+  function totalPlan(row) {
+    return Array.from({ length: 12 }, (_, i) => parseFloat(row[`mesec_${i+1}`]) || 0).reduce((a, b) => a + b, 0);
+  }
+  function totalReal(row) {
+    return Array.from({ length: 12 }, (_, i) => parseFloat(row[`real_${i+1}`]) || 0).reduce((a, b) => a + b, 0);
+  }
+
+  function doExport() {
+    const cols = [
+      { key:'sirovina_naziv', label:'Sirovina' },
+      { key:'kategorija', label:'Kategorija' },
+      { key:'jm', label:'JM' },
+      ...MESECI.map((m, i) => ({ key:`mesec_${i+1}`, label:`Plan ${m}` })),
+      ...MESECI.map((m, i) => ({ key:`real_${i+1}`, label:`Real ${m}` })),
+      { label:'Plan Ukupno', fn: r => totalPlan(r) },
+      { label:'Real Ukupno', fn: r => totalReal(r) },
+    ];
+    csvExport(rows, cols, `plan_nabavke_${godina}.csv`);
+  }
+
+  const years = [2024, 2025, 2026, 2027];
+  const kategorije = [...new Set(sirovine.map(s => s.kategorija).filter(Boolean))];
+
+  return (
+    <div className="page">
+      <div className="section">
+        <div className="section-head">
+          <h3>Plan nabavke</h3>
+          <div className="section-actions">
+            <select className="year-sel" value={godina} onChange={e => setGodina(parseInt(e.target.value))}>
+              {years.map(y => <option key={y}>{y}</option>)}
+            </select>
+            <select className="filter-sel" value={kat} onChange={e => setKat(e.target.value)}>
+              <option value="">Sve kategorije</option>
+              {kategorije.map(k => <option key={k}>{k}</option>)}
+            </select>
+            <button className="btn btn-secondary" onClick={() => setShowBudzet(!showBudzet)}>
+              {showBudzet ? 'Kolicine' : 'Budzet'}
+            </button>
+            <button className="btn btn-secondary" onClick={doExport}>CSV</button>
+          </div>
+        </div>
+        <div className="plan-table-wrap">
+          <table className="plan-table">
+            <thead>
+              <tr>
+                <th style={{minWidth:160}}>Sirovina</th>
+                <th>JM</th>
+                {MESECI.map((m, i) => <th key={i}>{m}</th>)}
+                <th>Ukupno</th>
+                <th>Realizovano</th>
+                <th>%</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map(row => {
+                const tp = totalPlan(row);
+                const tr2 = totalReal(row);
+                const pct = tp > 0 ? Math.round(tr2 / tp * 100) : null;
+                return (
+                  <tr key={row.sirovina_id}>
+                    <td style={{fontWeight:600,fontSize:12}}>{row.sirovina_naziv}</td>
+                    <td style={{fontSize:11,color:'#6b7280'}}>{row.jm}</td>
+                    {Array.from({length:12}, (_, i) => {
+                      const planKey = `mesec_${i+1}`;
+                      const budKey = `budzet_${i+1}`;
+                      const realKey = `real_${i+1}`;
+                      const fk = showBudzet ? budKey : planKey;
+                      const realVal = parseFloat(row[realKey]) || 0;
+                      return (
+                        <td key={i}>
+                          <div className="plan-input-wrap">
+                            {canEdit
+                              ? <input type="number" step="0.01" min="0"
+                                  value={row[fk] || ''}
+                                  onChange={e => onChange(row.sirovina_id, fk, e.target.value)}
+                                  placeholder="0"
+                                />
+                              : <span style={{fontSize:12}}>{fmtNum(row[fk] || 0)}</span>
+                            }
+                            {!showBudzet && realVal > 0 && <span className="plan-real">{fmtNum(realVal)}</span>}
+                          </div>
+                        </td>
+                      );
+                    })}
+                    <td style={{fontWeight:700,fontSize:12}}>{fmtNum(tp)}</td>
+                    <td style={{fontWeight:700,fontSize:12,color:'#059669'}}>{fmtNum(tr2)}</td>
+                    <td>{pct !== null
+                      ? <span className={'plan-pct ' + (pct >= 100 ? 'over' : 'under')}>{pct}%</span>
+                      : <span style={{color:'#9ca3af'}}>—</span>
+                    }</td>
+                  </tr>
+                );
+              })}
+              {rows.length === 0 && <tr><td colSpan={16} style={{textAlign:'center',color:'#9ca3af',padding:'32px'}}>Nema podataka</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// PLAN UGOVORA
+// ============================================================
+function UgovorModal({ item, dobavljaci, existingDobavljaciIds, onSave, onClose }) {
+  const [form, setForm] = useState({
+    dobavljacId: item?.dobavljac_id || '',
+    status: item?.status || 'nema_ugovor',
+    datum_potpisa: item?.datum_potpisa || '',
+    datum_isteka: item?.datum_isteka || '',
+    rok_placanja: item?.rok_placanja || '',
+    rabat: item?.rabat || '',
+    min_kolicina: item?.min_kolicina || '',
+    prioritet: item?.prioritet ?? 2,
+    napomena: item?.napomena || '',
+  });
+  const [saving, setSaving] = useState(false);
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const avail = dobavljaci.filter(d => !existingDobavljaciIds.includes(d.id) || d.id === item?.dobavljac_id);
+
+  async function submit(e) {
+    e.preventDefault();
+    if (!item && !form.dobavljacId) { toast('Izaberi dobavljaca', 'err'); return; }
+    setSaving(true);
+    try {
+      let r;
+      if (item) {
+        r = await api(`api/data.php?entity=plan_ugovora&id=${item.id}`, { method:'PUT', body: form });
+      } else {
+        r = await api('api/data.php?entity=plan_ugovora', { method:'POST', body: form });
+      }
+      onSave(r);
+      toast(item ? 'Ugovor azuriran' : 'Ugovor dodat');
+      onClose();
+    } catch(e) { toast(e.message, 'err'); } finally { setSaving(false); }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <h3>{item ? 'Izmeni ugovor' : 'Dodaj ugovor'}</h3>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+        <form onSubmit={submit}>
+          <div className="modal-body">
+            {!item && <div className="field"><label>Dobavljac *</label>
+              <select value={form.dobavljacId} onChange={e => set('dobavljacId', e.target.value)}>
+                <option value="">— Izaberi —</option>
+                {avail.map(d => <option key={d.id} value={d.id}>{d.naziv}</option>)}
+              </select>
+            </div>}
+            <div className="field-row">
+              <div className="field"><label>Status</label>
+                <select value={form.status} onChange={e => set('status', e.target.value)}>
+                  <option value="nema_ugovor">Nema ugovora</option>
+                  <option value="u_pregovorima">U pregovorima</option>
+                  <option value="potpisan">Potpisan</option>
+                  <option value="istekao">Istekao</option>
+                </select>
+              </div>
+              <div className="field"><label>Prioritet</label>
+                <select value={form.prioritet} onChange={e => set('prioritet', e.target.value)}>
+                  <option value="1">1 — Nizak</option>
+                  <option value="2">2 — Srednji</option>
+                  <option value="3">3 — Visok</option>
+                </select>
+              </div>
+            </div>
+            <div className="field-row">
+              <div className="field"><label>Datum potpisa</label><input type="date" value={form.datum_potpisa} onChange={e => set('datum_potpisa', e.target.value)} /></div>
+              <div className="field"><label>Datum isteka</label><input type="date" value={form.datum_isteka} onChange={e => set('datum_isteka', e.target.value)} /></div>
+            </div>
+            <div className="field-row">
+              <div className="field"><label>Rok placanja</label><input value={form.rok_placanja} onChange={e => set('rok_placanja', e.target.value)} placeholder="npr. 30 dana" /></div>
+              <div className="field"><label>Rabat</label><input value={form.rabat} onChange={e => set('rabat', e.target.value)} placeholder="npr. 5%" /></div>
+            </div>
+            <div className="field"><label>Min. kolicina</label><input value={form.min_kolicina} onChange={e => set('min_kolicina', e.target.value)} /></div>
+            <div className="field"><label>Napomena</label><textarea value={form.napomena} onChange={e => set('napomena', e.target.value)} /></div>
+          </div>
+          <div className="modal-foot">
+            <button type="button" className="btn btn-secondary" onClick={onClose}>Otkaži</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Cuvanje...' : 'Sacuvaj'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function PlanUgovora({ user }) {
+  const [rows, setRows] = useState([]);
+  const [dobavljaci, setDobavljaci] = useState([]);
+  const [statusFilter, setStatusFilter] = useState('');
+  const [modal, setModal] = useState(null);
+  const [confirm, setConfirm] = useState(null);
+  const canEdit = user.uloga !== 'viewer';
+
+  async function load() {
+    try {
+      const [r, d] = await Promise.all([
+        api(`api/data.php?entity=plan_ugovora${statusFilter ? '&status='+statusFilter : ''}`),
+        api('api/data.php?entity=dobavljaci'),
+      ]);
+      setRows(r); setDobavljaci(d);
+    } catch(e) { toast(e.message, 'err'); }
+  }
+
+  useEffect(() => { load(); }, [statusFilter]);
+
+  function onSave(saved) {
+    setRows(prev => {
+      const idx = prev.findIndex(r => r.id === saved.id);
+      if (idx >= 0) { const n = [...prev]; n[idx] = saved; return n; }
+      return [saved, ...prev];
+    });
+  }
+
+  async function doDelete(id) {
+    try {
+      await api(`api/data.php?entity=plan_ugovora&id=${id}`, { method:'DELETE' });
+      setRows(r => r.filter(x => x.id !== id));
+      toast('Ugovor obrisan');
+    } catch(e) { toast(e.message, 'err'); }
+    setConfirm(null);
+  }
+
+  function doExport() {
+    csvExport(rows, [
+      { key:'dobavljac_naziv', label:'Dobavljac' },
+      { key:'status', label:'Status' },
+      { key:'datum_potpisa', label:'Datum potpisa' },
+      { key:'datum_isteka', label:'Datum isteka' },
+      { key:'rok_placanja', label:'Rok placanja' },
+      { key:'rabat', label:'Rabat' },
+      { key:'min_kolicina', label:'Min kolicina' },
+      { key:'prioritet', label:'Prioritet' },
+      { key:'napomena', label:'Napomena' },
+    ], 'plan_ugovora.csv');
+  }
+
+  const prioLabel = { 1: 'Nizak', 2: 'Srednji', 3: 'Visok' };
+  const existingIds = rows.map(r => r.dobavljac_id);
+
+  return (
+    <div className="page">
+      <div className="section-head" style={{background:'#fff',borderRadius:12,padding:'16px 20px',marginBottom:16,boxShadow:'0 1px 4px rgba(0,0,0,.06)'}}>
+        <h3 style={{fontSize:15,fontWeight:700}}>Plan ugovora ({rows.length})</h3>
+        <div className="section-actions">
+          <select className="filter-sel" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+            <option value="">Svi statusi</option>
+            <option value="potpisan">Potpisan</option>
+            <option value="u_pregovorima">U pregovorima</option>
+            <option value="nema_ugovor">Nema ugovora</option>
+            <option value="istekao">Istekao</option>
+          </select>
+          <button className="btn btn-secondary" onClick={doExport}>CSV</button>
+          {canEdit && <button className="btn btn-primary" onClick={() => setModal('add')}>+ Dodaj</button>}
+        </div>
+      </div>
+      {rows.length === 0
+        ? <div className="empty"><div className="empty-icon">📄</div><p>Nema ugovora</p></div>
+        : <div className="cards-grid">
+            {rows.map(r => (
+              <div key={r.id} className={'card status-' + r.status}>
+                <div className="card-head">
+                  <div>
+                    <div className="card-title">{r.dobavljac_naziv}</div>
+                    <div className="card-sub">{r.kontakt_osoba || '—'}</div>
+                  </div>
+                  <div style={{textAlign:'right'}}>
+                    <UgovorStatus status={r.status} />
+                    <div style={{fontSize:11,marginTop:4}} className={'prio-'+r.prioritet}>
+                      Prioritet: {prioLabel[r.prioritet] || r.prioritet}
+                    </div>
+                  </div>
+                </div>
+                <div className="card-info">
+                  {r.datum_potpisa && <div><b>Potpisan:</b> {fmtDate(r.datum_potpisa)}</div>}
+                  {r.datum_isteka && <div><b>Istice:</b> {fmtDate(r.datum_isteka)}</div>}
+                  {r.rok_placanja && <div><b>Rok placanja:</b> {r.rok_placanja}</div>}
+                  {r.rabat && <div><b>Rabat:</b> {r.rabat}</div>}
+                  {r.min_kolicina && <div><b>Min. kolicina:</b> {r.min_kolicina}</div>}
+                  {r.napomena && <div><b>Napomena:</b> {r.napomena}</div>}
+                </div>
+                {canEdit && (
+                  <div className="card-foot">
+                    <Stars value={parseInt(r.ocena || 3)} />
+                    <div style={{display:'flex',gap:6}}>
+                      <button className="btn btn-secondary" style={{padding:'5px 10px'}} onClick={() => setModal(r)}>Izmeni</button>
+                      <button className="btn btn-danger" style={{padding:'5px 10px'}} onClick={() => setConfirm(r)}>Briši</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+      }
+      {modal && <UgovorModal item={modal === 'add' ? null : modal} dobavljaci={dobavljaci} existingDobavljaciIds={existingIds} onSave={onSave} onClose={() => setModal(null)} />}
+      {confirm && <ConfirmModal msg={`Obrisati ugovor za "${confirm.dobavljac_naziv}"?`} onOk={() => doDelete(confirm.id)} onCancel={() => setConfirm(null)} />}
+    </div>
+  );
+}
+
+// ============================================================
+// KORISNICI (admin)
+// ============================================================
+function KorisniciModal({ item, onSave, onClose }) {
+  const [form, setForm] = useState({
+    ime: item?.ime || '',
+    uloga: item?.uloga || 'viewer',
+    aktivan: item?.aktivan ?? 1,
+    newPassword: '',
+  });
+  const [saving, setSaving] = useState(false);
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  async function submit(e) {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const payload = { ...form, aktivan: parseInt(form.aktivan) };
+      if (item) {
+        await api(`api/auth.php?action=update-user&id=${item.id}`, { method:'PUT', body: payload });
+        onSave({ ...item, ...form });
+        toast('Korisnik azuriran');
+      }
+      onClose();
+    } catch(e) { toast(e.message, 'err'); } finally { setSaving(false); }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:420}} onClick={e => e.stopPropagation()}>
+        <div className="modal-head"><h3>Izmeni korisnika</h3><button className="modal-close" onClick={onClose}>×</button></div>
+        <form onSubmit={submit}>
+          <div className="modal-body">
+            <div className="field"><label>Korisnicko ime</label><input value={item?.username} disabled style={{background:'#f9fafb'}} /></div>
+            <div className="field"><label>Ime i prezime</label><input value={form.ime} onChange={e => set('ime', e.target.value)} /></div>
+            <div className="field-row">
+              <div className="field"><label>Uloga</label>
+                <select value={form.uloga} onChange={e => set('uloga', e.target.value)}>
+                  <option value="admin">Admin</option>
+                  <option value="nabavka">Nabavka</option>
+                  <option value="viewer">Viewer</option>
+                </select>
+              </div>
+              <div className="field"><label>Status</label>
+                <select value={form.aktivan} onChange={e => set('aktivan', e.target.value)}>
+                  <option value={1}>Aktivan</option>
+                  <option value={0}>Neaktivan</option>
+                </select>
+              </div>
+            </div>
+            <div className="field"><label>Nova lozinka (prazno = ne menjaj)</label><input type="password" value={form.newPassword} onChange={e => set('newPassword', e.target.value)} placeholder="Nova lozinka..." /></div>
+          </div>
+          <div className="modal-foot">
+            <button type="button" className="btn btn-secondary" onClick={onClose}>Otkaži</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Cuvanje...' : 'Sacuvaj'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function Korisnici({ user }) {
+  const [rows, setRows] = useState([]);
+  const [modal, setModal] = useState(null);
+
+  useEffect(() => {
+    api('api/auth.php?action=users').then(setRows).catch(e => toast(e.message, 'err'));
+  }, []);
+
+  const ulogaLabel = { admin:'Admin', nabavka:'Nabavka', viewer:'Viewer' };
+  const ulogaBadge = { admin:'badge-purple', nabavka:'badge-blue', viewer:'badge-gray' };
+
+  return (
+    <div className="page">
+      <div className="section">
+        <div className="section-head"><h3>Korisnici sistema</h3></div>
+        <div className="table-wrap">
+          <table>
+            <thead><tr><th>Korisnicko ime</th><th>Ime</th><th>Uloga</th><th>Status</th><th>Akcije</th></tr></thead>
+            <tbody>
+              {rows.map(r => (
+                <tr key={r.id}>
+                  <td style={{fontWeight:600}}>{r.username}</td>
+                  <td>{r.ime}</td>
+                  <td><span className={`badge ${ulogaBadge[r.uloga]}`}>{ulogaLabel[r.uloga]}</span></td>
+                  <td>{r.aktivan ? <span className="badge badge-ok">Aktivan</span> : <span className="badge badge-gray">Neaktivan</span>}</td>
+                  <td><button className="btn btn-secondary" onClick={() => setModal(r)}>Izmeni</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {modal && <KorisniciModal item={modal} onSave={saved => setRows(prev => prev.map(r => r.id === saved.id ? saved : r))} onClose={() => setModal(null)} />}
+    </div>
+  );
+}
+
+// ============================================================
+// CHANGE PASSWORD
+// ============================================================
+function ChangePassword({ onClose }) {
+  const [form, setForm] = useState({ oldPassword:'', newPassword:'', confirm:'' });
+  const [saving, setSaving] = useState(false);
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  async function submit(e) {
+    e.preventDefault();
+    if (form.newPassword !== form.confirm) { toast('Lozinke se ne poklapaju', 'err'); return; }
+    if (form.newPassword.length < 6) { toast('Lozinka mora imati min. 6 karaktera', 'err'); return; }
+    setSaving(true);
+    try {
+      await api('api/auth.php?action=change-password', { method:'POST', body: { oldPassword: form.oldPassword, newPassword: form.newPassword } });
+      toast('Lozinka promenjena');
+      onClose();
+    } catch(e) { toast(e.message, 'err'); } finally { setSaving(false); }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:380}} onClick={e => e.stopPropagation()}>
+        <div className="modal-head"><h3>Promeni lozinku</h3><button className="modal-close" onClick={onClose}>×</button></div>
+        <form onSubmit={submit}>
+          <div className="modal-body">
+            <div className="field"><label>Stara lozinka</label><input type="password" value={form.oldPassword} onChange={e => set('oldPassword', e.target.value)} autoFocus /></div>
+            <div className="field"><label>Nova lozinka</label><input type="password" value={form.newPassword} onChange={e => set('newPassword', e.target.value)} /></div>
+            <div className="field"><label>Potvrdi novu lozinku</label><input type="password" value={form.confirm} onChange={e => set('confirm', e.target.value)} /></div>
+          </div>
+          <div className="modal-foot">
+            <button type="button" className="btn btn-secondary" onClick={onClose}>Otkaži</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Menjanje...' : 'Promeni'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// APP
+// ============================================================
+const TABS = [
+  { id:'dashboard', lbl:'Pregled' },
+  { id:'sirovine', lbl:'Sirovine' },
+  { id:'dobavljaci', lbl:'Dobavljaci' },
+  { id:'narudzbine', lbl:'Narudzbine' },
+  { id:'kontroling', lbl:'Kontroling' },
+  { id:'plan', lbl:'Plan nabavke' },
+  { id:'ugovori', lbl:'Plan ugovora' },
+];
+
+function LoginScreen({ onLogin }) {
+  const [form, setForm] = useState({ username:'', password:'' });
+  const [err, setErr] = useState('');
+  const [loading, setLoading] = useState(false);
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  async function submit(e) {
+    e.preventDefault();
+    setErr(''); setLoading(true);
+    try {
+      const user = await api('api/auth.php?action=login', { method:'POST', body: form });
+      onLogin(user);
+    } catch(e) {
+      setErr(e.message || 'Greška pri prijavi');
+    } finally { setLoading(false); }
+  }
+
+  return (
+    <div className="login-wrap">
+      <div className="login-box">
+        <div className="login-logo">
+          <div className="logo-k">K</div>
+          <h2>Koloid — Nabavka</h2>
+          <p>Sistem za pracenje nabavke</p>
+        </div>
+        {err && <div className="login-err">{err}</div>}
+        <form onSubmit={submit}>
+          <div className="form-group">
+            <label>Korisnicko ime</label>
+            <input value={form.username} onChange={e => set('username', e.target.value)} autoFocus autoComplete="username" />
+          </div>
+          <div className="form-group">
+            <label>Lozinka</label>
+            <input type="password" value={form.password} onChange={e => set('password', e.target.value)} autoComplete="current-password" />
+          </div>
+          <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
+            {loading ? 'Prijavljivanje...' : 'Prijavi se'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [user, setUser] = useState(null);
+  const [checking, setChecking] = useState(true);
+  const [tab, setTab] = useState('dashboard');
+  const [changePwd, setChangePwd] = useState(false);
+  const toasts = useToasts();
+
+  useEffect(() => {
+    api('api/auth.php?action=me')
+      .then(u => { setUser(u); setChecking(false); })
+      .catch(() => setChecking(false));
+  }, []);
+
+  async function logout() {
+    try { await api('api/auth.php?action=logout', { method:'POST' }); } catch(_) {}
+    setUser(null);
+  }
+
+  if (checking) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',color:'#6b7280'}}>Ucitavanje...</div>;
+  if (!user) return <>
+    <LoginScreen onLogin={u => { setUser(u); setTab('dashboard'); }} />
+    <div className="toast-container">{toasts.map(t => <div key={t.id} className={'toast ' + t.type}>{t.msg}</div>)}</div>
+  </>;
+
+  const tabs = user.uloga === 'admin'
+    ? [...TABS, { id:'korisnici', lbl:'Korisnici' }]
+    : TABS;
+
+  return (
+    <>
+      <header>
+        <div className="header-left">
+          <div className="logo-k">K</div>
+          <div>
+            <div>Koloid — Nabavka</div>
+            <div className="subtitle">Koloid d.o.o.</div>
+          </div>
+        </div>
+        <div className="header-right">
+          <div className="user-badge" style={{cursor:'pointer'}} onClick={() => setChangePwd(true)}>
+            {user.ime} <span>{user.uloga}</span>
+          </div>
+          <button className="btn btn-logout" onClick={logout}>Odjava</button>
+        </div>
+      </header>
+      <div className="tabs-bar">
+        {tabs.map(t => (
+          <button key={t.id} className={'tab-btn' + (tab === t.id ? ' active' : '')} onClick={() => setTab(t.id)}>
+            {t.lbl}
+          </button>
+        ))}
+      </div>
+      {tab === 'dashboard'   && <Dashboard user={user} />}
+      {tab === 'sirovine'    && <Sirovine user={user} />}
+      {tab === 'dobavljaci'  && <Dobavljaci user={user} />}
+      {tab === 'narudzbine'  && <Narudzbine user={user} />}
+      {tab === 'kontroling'  && <Kontroling user={user} />}
+      {tab === 'plan'        && <PlanNabavke user={user} />}
+      {tab === 'ugovori'     && <PlanUgovora user={user} />}
+      {tab === 'korisnici'   && <Korisnici user={user} />}
+      {changePwd && <ChangePassword onClose={() => setChangePwd(false)} />}
+      <div className="toast-container">{toasts.map(t => <div key={t.id} className={'toast ' + t.type}>{t.msg}</div>)}</div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
